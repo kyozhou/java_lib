@@ -39,8 +39,8 @@ public class Utils {
         }
     }
 
-    public static String httpPost(String url, HashMap params, HashMap headers) {
-        final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+    public static String httpPost(String url, HashMap params, HashMap headers, MediaType mediaType) {
+        final MediaType JSON = mediaType == null ? MediaType.parse("application/json; charset=utf-8") : mediaType;
         OkHttpClient client = new OkHttpClient();
         RequestBody body = RequestBody.create(JSON, new JSONObject(params).toString());
         Request request = new Request.Builder()
