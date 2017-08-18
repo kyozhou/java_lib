@@ -17,7 +17,7 @@ public class FastCache {
     public static FastCache getInstance(String channel) {
         if(FastCache.isAutoCleanerStarted == false) {
             FastCache.isAutoCleanerStarted = true;
-            ExecutorService executorService = Executors.newFixedThreadPool(3);
+            ExecutorService executorService = Executors.newSingleThreadExecutor();
             executorService.execute(new Runnable() {
                 public void run() {
                     while (true) {
