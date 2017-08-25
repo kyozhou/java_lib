@@ -1,10 +1,24 @@
 package com.mirahome.lib
 
-/**
- * Created by zhoubin on 2017/7/6.
- */
-class UtilsTest extends GroovyTestCase {
+class UtilsTest extends groovy.util.GroovyTestCase {
+    void testMd5() {
+
+    }
+
+    void testSerialize() {
+    }
+
+    void testDeserialize() {
+    }
+
     void testGetLocalIP() {
-        System.out.println("local ip : " + Utils.getLocalIP());
+    }
+
+    void testHttpGet() {
+        String returnData = Utils.httpGet("http://api.openweathermap.org/data/2.5/weather?q=&lat=en&lon=shanghai&lang=&units=&appid=b653c295f16cfa5b2e9af384bbaf4479", null);
+        System.out.println(returnData);
+        if(returnData.isEmpty()) {
+
+        }
     }
 }

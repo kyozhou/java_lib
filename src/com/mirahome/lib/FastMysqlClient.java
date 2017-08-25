@@ -64,6 +64,7 @@ public class FastMysqlClient {
             boolean isSuccsss = this.stmt.execute(sql);
             if(isSuccsss) {
                 ResultSet result = this.stmt.getGeneratedKeys();
+                this.stmt.close();
                 return result.getInt(1);
             }else {
                 return 0;
@@ -80,7 +81,9 @@ public class FastMysqlClient {
                 this.connectMysql();
             }
             this.stmt = conn.createStatement();
-            return this.stmt.executeUpdate(sql) > 0;
+            boolean isSuccess = this.stmt.executeUpdate(sql) > 0;
+            this.stmt.close();
+            return isSuccess;
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -129,6 +132,7 @@ public class FastMysqlClient {
                 }
                 table.add(row);
             }
+            this.stmt.close();
             return table;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -153,6 +157,7 @@ public class FastMysqlClient {
             while (result.next()) {
                 column.add(result.getObject(1));
             }
+            this.stmt.close();
             return column;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -168,6 +173,7 @@ public class FastMysqlClient {
             this.stmt = conn.createStatement();
             ResultSet result = this.stmt.executeQuery(sql);
             if (result.next()) {
+                this.stmt.close();
                 return result.getObject(1);
             }
         } catch (SQLException e) {
