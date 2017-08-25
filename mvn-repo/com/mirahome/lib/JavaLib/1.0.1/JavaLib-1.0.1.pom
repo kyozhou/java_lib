@@ -85,8 +85,7 @@
     </dependencies>
     <distributionManagement>
         <repository>
-            <id>JavaLibRepo</id>
-            <name>Internal Repository</name>
+            <id>JavaLib</id>
             <url>file://${project.basedir}/mvn-repo</url>
         </repository>
     </distributionManagement>
