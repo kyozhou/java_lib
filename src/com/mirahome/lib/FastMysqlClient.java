@@ -19,7 +19,7 @@ public class FastMysqlClient {
     private String username = null;
     private String password = null;
 
-    public static FastMysqlClient getInstance(String connectionString, String username, String password) {
+    public static synchronized FastMysqlClient getInstance(String connectionString, String username, String password) {
         String key = DigestUtils.md5Hex(connectionString);
         if(FastMysqlClient.mysqls.get(key) == null) {
             FastMysqlClient fastMysqlClient = new FastMysqlClient(connectionString, username, password);
@@ -45,6 +45,7 @@ public class FastMysqlClient {
         try {
             if(this.conn == null || this.conn.isClosed()) {
                 this.conn = DriverManager.getConnection(this.connectionString, this.username, this.password);
+                this.stmt = this.conn.createStatement();
                 return true;
             }else {
                 return false;
@@ -60,18 +61,13 @@ public class FastMysqlClient {
             if(this.conn.isClosed()) {
                 this.connectMysql();
             }
-            this.stmt = conn.createStatement();
             boolean isSuccsss = this.stmt.execute(sql);
             if(isSuccsss) {
                 ResultSet result = this.stmt.getGeneratedKeys();
                 int key = result.getInt(1);
                 if(!result.isClosed()) result.close();
-                if(!this.stmt.isClosed()) this.stmt.close();
-                if(!this.conn.isClosed()) this.conn.close();
                 return key;
             }else {
-                if(!this.stmt.isClosed()) this.stmt.close();
-                if(!this.conn.isClosed()) this.conn.close();
                 return 0;
             }
         } catch (SQLException e) {
@@ -85,10 +81,7 @@ public class FastMysqlClient {
             if(this.conn.isClosed()) {
                 this.connectMysql();
             }
-            this.stmt = conn.createStatement();
             boolean isSuccess = this.stmt.executeUpdate(sql) > 0;
-            if(!this.stmt.isClosed()) this.stmt.close();
-            if(!this.conn.isClosed()) this.conn.close();
             return isSuccess;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -105,8 +98,6 @@ public class FastMysqlClient {
             if(this.conn.isClosed()) {
                 this.connectMysql();
             }
-            this.stmt = conn.createStatement();
-
             ResultSet result = this.stmt.executeQuery(sql);
             List<HashMap> table = new LinkedList<HashMap>();
             HashMap<String, Object> row;
@@ -140,8 +131,6 @@ public class FastMysqlClient {
                 table.add(row);
             }
             if(!result.isClosed()) result.close();
-            if(!this.stmt.isClosed()) this.stmt.close();
-            if(!this.conn.isClosed()) this.conn.close();
             return table;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -159,7 +148,6 @@ public class FastMysqlClient {
             if(this.conn.isClosed()) {
                 this.connectMysql();
             }
-            this.stmt = conn.createStatement();
             ResultSet result = this.stmt.executeQuery(sql);
             ResultSetMetaData metaData = result.getMetaData();
             List<Object> column = new LinkedList<Object>();
@@ -167,8 +155,6 @@ public class FastMysqlClient {
                 column.add(result.getObject(1));
             }
             if(!result.isClosed()) result.close();
-            if(!this.stmt.isClosed()) this.stmt.close();
-            if(!this.conn.isClosed()) this.conn.close();
             return column;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -182,14 +168,11 @@ public class FastMysqlClient {
             if(this.conn.isClosed()) {
                 this.connectMysql();
             }
-            this.stmt = conn.createStatement();
             ResultSet result = this.stmt.executeQuery(sql);
             if (result.next()) {
                 returnData = result.getObject(1);
             }
             if(!result.isClosed()) result.close();
-            if(!this.stmt.isClosed()) this.stmt.close();
-            if(!this.conn.isClosed()) this.conn.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }

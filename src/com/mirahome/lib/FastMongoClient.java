@@ -9,14 +9,13 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.InsertManyOptions;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
-import org.bson.BsonDocument;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import org.apache.commons.codec.digest.DigestUtils;
 
 /**
  * Created by zhoubin on 2017/4/27.
@@ -29,7 +28,7 @@ public class FastMongoClient {
     private MongoDatabase mongoDatabase = null;
 
 
-    public static FastMongoClient getInstance(String connectionString, String database) {
+    public static synchronized FastMongoClient getInstance(String connectionString, String database) {
         String key = DigestUtils.md5Hex(connectionString + database);
         if(mongos.get(key) == null) {
             FastMongoClient fastMongoClient = new FastMongoClient(connectionString, database);
