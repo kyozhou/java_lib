@@ -6,13 +6,13 @@
     <packaging>jar</packaging>
     <version>1.0.1</version>
     <build>
-        <!--directory>target</directory>
+        <directory>target</directory>
         <outputDirectory>target/classes</outputDirectory>
         <finalName>${project.artifactId}-${project.version}</finalName>
         <testOutputDirectory>target/test-classes</testOutputDirectory>
         <sourceDirectory>src</sourceDirectory>
         <scriptSourceDirectory>src</scriptSourceDirectory>
-        <testSourceDirectory>src</testSourceDirectory-->
+        <testSourceDirectory>src</testSourceDirectory>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -86,6 +86,7 @@
     <distributionManagement>
         <repository>
             <id>JavaLib</id>
+            <name>JavaLib</name>
             <url>file://${project.basedir}/mvn-repo</url>
         </repository>
     </distributionManagement>
