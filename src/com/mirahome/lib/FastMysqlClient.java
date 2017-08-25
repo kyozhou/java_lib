@@ -64,9 +64,14 @@ public class FastMysqlClient {
             boolean isSuccsss = this.stmt.execute(sql);
             if(isSuccsss) {
                 ResultSet result = this.stmt.getGeneratedKeys();
-                this.stmt.close();
-                return result.getInt(1);
+                int key = result.getInt(1);
+                if(!result.isClosed()) result.close();
+                if(!this.stmt.isClosed()) this.stmt.close();
+                if(!this.conn.isClosed()) this.conn.close();
+                return key;
             }else {
+                if(!this.stmt.isClosed()) this.stmt.close();
+                if(!this.conn.isClosed()) this.conn.close();
                 return 0;
             }
         } catch (SQLException e) {
@@ -82,7 +87,8 @@ public class FastMysqlClient {
             }
             this.stmt = conn.createStatement();
             boolean isSuccess = this.stmt.executeUpdate(sql) > 0;
-            this.stmt.close();
+            if(!this.stmt.isClosed()) this.stmt.close();
+            if(!this.conn.isClosed()) this.conn.close();
             return isSuccess;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -100,6 +106,7 @@ public class FastMysqlClient {
                 this.connectMysql();
             }
             this.stmt = conn.createStatement();
+
             ResultSet result = this.stmt.executeQuery(sql);
             List<HashMap> table = new LinkedList<HashMap>();
             HashMap<String, Object> row;
@@ -132,7 +139,9 @@ public class FastMysqlClient {
                 }
                 table.add(row);
             }
-            this.stmt.close();
+            if(!result.isClosed()) result.close();
+            if(!this.stmt.isClosed()) this.stmt.close();
+            if(!this.conn.isClosed()) this.conn.close();
             return table;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -157,7 +166,9 @@ public class FastMysqlClient {
             while (result.next()) {
                 column.add(result.getObject(1));
             }
-            this.stmt.close();
+            if(!result.isClosed()) result.close();
+            if(!this.stmt.isClosed()) this.stmt.close();
+            if(!this.conn.isClosed()) this.conn.close();
             return column;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -166,6 +177,7 @@ public class FastMysqlClient {
     }
 
     public Object fetchCell(String sql) {
+        Object returnData = new Object();
         try {
             if(this.conn.isClosed()) {
                 this.connectMysql();
@@ -173,12 +185,14 @@ public class FastMysqlClient {
             this.stmt = conn.createStatement();
             ResultSet result = this.stmt.executeQuery(sql);
             if (result.next()) {
-                this.stmt.close();
-                return result.getObject(1);
+                returnData = result.getObject(1);
             }
+            if(!result.isClosed()) result.close();
+            if(!this.stmt.isClosed()) this.stmt.close();
+            if(!this.conn.isClosed()) this.conn.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return new Object();
+        return returnData;
     }
 }
