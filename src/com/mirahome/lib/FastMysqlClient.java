@@ -130,7 +130,7 @@ public class FastMysqlClient {
                 }
                 table.add(row);
             }
-            if(!result.isClosed()) result.close();
+            //if(!result.isClosed()) result.close();
             return table;
         } catch (SQLException e) {
             e.printStackTrace();

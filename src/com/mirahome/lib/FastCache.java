@@ -10,7 +10,7 @@ public class FastCache {
     private static HashMap<String, FastCache> instances = new HashMap<String, FastCache>();
     private static boolean isAutoCleanerStarted = false;
 
-    private HashMap cache = new HashMap();
+    private HashMap<String, Object> cache = new HashMap<>();
     private String channel = null;
 
 
@@ -27,7 +27,7 @@ public class FastCache {
                                 Map.Entry entry = (Map.Entry) it.next();
                                 ((FastCache) entry.getValue()).cleanExpired();
                             }
-                            Thread.sleep(10000);
+                            Thread.sleep(30000);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -55,7 +55,7 @@ public class FastCache {
             this.cache.clear();
         }
         Integer timestampNow = (int) (System.currentTimeMillis() / 1000);
-        HashMap obj2Set = new HashMap();
+        HashMap<String, Object> obj2Set = new HashMap<>();
         obj2Set.put("value", value);
         obj2Set.put("time_expire", timestampNow + timeout);
         this.cache.put(key, obj2Set);
@@ -87,14 +87,18 @@ public class FastCache {
     private void cleanExpired() {
         Integer timestampNow = (int) (System.currentTimeMillis() / 1000);
         Iterator it = this.cache.entrySet().iterator();
+        HashMap<String, Object> cacheTemp = new HashMap<>();
         while (it.hasNext()) {
             Map.Entry entry = (Map.Entry) it.next();
             String key = entry.getKey().toString();
-            HashMap valueOuter = (HashMap) entry.getValue();
-            if(valueOuter == null || (Integer)valueOuter.get("time_expire") < timestampNow) {
-                this.cache.remove(key);
+            Object value = entry.getValue();
+            HashMap<String, Object> valueOuter = value instanceof HashMap ? (HashMap) entry.getValue() : null;
+            if(valueOuter != null && valueOuter.containsKey("time_expire")
+                    && (Integer)valueOuter.get("time_expire") > timestampNow) {
+                cacheTemp.put(key, valueOuter);
             }
         }
+        this.cache = cacheTemp;
     }
 }
 
