@@ -27,7 +27,7 @@ public class FastCache {
                             Iterator it = FastCache.instances.entrySet().iterator();
                             while (it.hasNext()) {
                                 Map.Entry entry = (Map.Entry) it.next();
-                                ((FastCache) entry.getValue()).cleanExpired();
+                                ((FastCache) entry.getValue()).removeCache(null);
                             }
                             Thread.sleep(30000);
                         } catch (InterruptedException e) {
@@ -59,7 +59,7 @@ public class FastCache {
         obj2Set.put("time_expire", timestampNow + timeout);
         this.cache.put(key, obj2Set);
         while(this.cache.size() > 1000000) {
-            this.cache.remove(0);
+            this.removeCache(0);
         }
     }
 
@@ -79,26 +79,37 @@ public class FastCache {
         Integer timestampNow = (int) (System.currentTimeMillis() / 1000);
         HashMap valueOuter = (HashMap) this.cache.get(key);
         if(valueOuter == null || (Integer)valueOuter.get("time_expire") < timestampNow) {
-            this.cache.remove(key);
+            this.removeCache(key);
             return null;
         }else {
             return valueOuter.get("value");
         }
     }
 
-    private synchronized void cleanExpired() {
-        Integer timestampNow = (int) (System.currentTimeMillis() / 1000);
+    private synchronized void removeCache(Object key) {
         try {
-            for (int i = 0; i < this.cache.size(); i++) {
-                Object value = this.cache.getValue(i);
-                HashMap<String, Object> valueOuter = value instanceof HashMap ?
-                        (HashMap) value : null;
-                if (valueOuter == null || (valueOuter.containsKey("time_expire")
-                        && (Integer) valueOuter.get("time_expire") < timestampNow)) {
-                    this.cache.remove(i);
+            if(key == null) {
+                Integer timestampNow = (int) (System.currentTimeMillis() / 1000);
+                for (int i = 0; i < this.cache.size(); i++) {
+                    Object value = this.cache.getValue(i);
+                    HashMap<String, Object> valueOuter = value instanceof HashMap ?
+                            (HashMap) value : null;
+                    if (valueOuter == null || (valueOuter.containsKey("time_expire")
+                            && (Integer) valueOuter.get("time_expire") < timestampNow)) {
+                        this.cache.remove(i);
+                    }
+                }
+            } else {
+                if(key instanceof String) {
+                    if (this.cache.containsKey(key)) {
+                        this.cache.remove(key);
+                    }
+                }else if(key instanceof Integer) {
+                    int keyInt = Integer.parseInt(key.toString());
+                    this.cache.remove(keyInt);
                 }
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
