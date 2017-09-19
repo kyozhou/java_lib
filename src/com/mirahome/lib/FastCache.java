@@ -109,6 +109,8 @@ public class FastCache {
                     this.cache.remove(keyInt);
                 }
             }
+        } catch (NullPointerException e) {
+            System.out.println("Warning: cache has been removed...........");
         } catch (Exception e) {
             e.printStackTrace();
         }
