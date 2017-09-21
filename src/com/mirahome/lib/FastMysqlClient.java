@@ -13,8 +13,8 @@ import java.util.List;
 public class FastMysqlClient {
 
     private static HashMap<String, FastMysqlClient> mysqls = new HashMap<String, FastMysqlClient>();
-    Connection conn = null;
-    Statement stmt = null;
+    private Connection conn = null;
+    private Statement stmt = null;
     private String connectionString = null;
     private String username = null;
     private String password = null;
@@ -41,26 +41,22 @@ public class FastMysqlClient {
         }
     }
 
-    private boolean connectMysql() {
+    private void connectMysql() {
         try {
             if(this.conn == null || this.conn.isClosed()) {
                 this.conn = DriverManager.getConnection(this.connectionString, this.username, this.password);
                 this.stmt = this.conn.createStatement();
-                return true;
-            }else {
-                return false;
+            }else if(this.stmt.isClosed()) {
+                this.stmt = this.conn.createStatement();
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
         }
     }
 
     public int insert(String sql) {
         try {
-            if(this.conn.isClosed()) {
-                this.connectMysql();
-            }
+            this.connectMysql();
             boolean isSuccsss = this.stmt.execute(sql);
             if(isSuccsss) {
                 ResultSet result = this.stmt.getGeneratedKeys();
@@ -78,11 +74,8 @@ public class FastMysqlClient {
 
     public boolean update(String sql) {
         try {
-            if(this.conn.isClosed()) {
-                this.connectMysql();
-            }
-            boolean isSuccess = this.stmt.executeUpdate(sql) > 0;
-            return isSuccess;
+            this.connectMysql();
+            return this.stmt.executeUpdate(sql) > 0;
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -95,9 +88,7 @@ public class FastMysqlClient {
 
     public List<HashMap> fetchTable(String sql) {
         try {
-            if(this.conn.isClosed()) {
-                this.connectMysql();
-            }
+            this.connectMysql();
             ResultSet result = this.stmt.executeQuery(sql);
             List<HashMap> table = new LinkedList<HashMap>();
             HashMap<String, Object> row;
@@ -140,14 +131,12 @@ public class FastMysqlClient {
 
     public HashMap<String, Object> fetchRow(String sql) {
         List<HashMap> table = this.fetchTable(sql);
-        return table.size() >=1 ? table.get(0) : new HashMap<String, Object>();
+        return table !=null && table.size() >=1 ? table.get(0) : new HashMap<String, Object>();
     }
 
     public List<Object> fetchColumn(String sql) {
         try {
-            if(this.conn.isClosed()) {
-                this.connectMysql();
-            }
+            this.connectMysql();
             ResultSet result = this.stmt.executeQuery(sql);
             ResultSetMetaData metaData = result.getMetaData();
             List<Object> column = new LinkedList<Object>();
@@ -165,9 +154,7 @@ public class FastMysqlClient {
     public Object fetchCell(String sql) {
         Object returnData = new Object();
         try {
-            if(this.conn.isClosed()) {
-                this.connectMysql();
-            }
+            this.connectMysql();
             ResultSet result = this.stmt.executeQuery(sql);
             if (result.next()) {
                 returnData = result.getObject(1);
@@ -178,4 +165,5 @@ public class FastMysqlClient {
         }
         return returnData;
     }
+
 }
