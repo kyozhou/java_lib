@@ -91,16 +91,16 @@ public class FastCache {
             if(key == null) {
                 Integer timestampNow = (int) (System.currentTimeMillis() / 1000);
                 for (int i = 0; i < this.cache.size(); i++) {
-                    Object value = this.cache.getValue(i);
-                    HashMap<String, Object> valueOuter = value instanceof HashMap ?
-                            (HashMap) value : null;
-                    if (valueOuter == null || (valueOuter.containsKey("time_expire")
-                            && (Integer) valueOuter.get("time_expire") < timestampNow)) {
-                        try {
+                    try {
+                        Object value = this.cache.getValue(i);
+                        HashMap<String, Object> valueOuter = value instanceof HashMap ?
+                                (HashMap) value : null;
+                        if (valueOuter == null || (valueOuter.containsKey("time_expire")
+                                && (Integer) valueOuter.get("time_expire") < timestampNow)) {
                             this.cache.remove(i);
-                        }catch (NullPointerException e) {
-                            System.out.println("Warning: cache has been removed...........");
                         }
+                    }catch (NullPointerException e) {
+                        System.out.println("Warning: cache has been removed...........");
                     }
                 }
             } else {
