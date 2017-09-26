@@ -18,6 +18,7 @@ public class FastMysqlClient {
     private String connectionString = null;
     private String username = null;
     private String password = null;
+    private long expiredTime = 0;
 
     public static synchronized FastMysqlClient getInstance(String connectionString, String username, String password) {
         String key = DigestUtils.md5Hex(connectionString);
@@ -43,9 +44,11 @@ public class FastMysqlClient {
 
     private void connectMysql() {
         try {
-            if(this.conn == null || this.conn.isClosed()) {
+            long timeNow = System.currentTimeMillis();
+            if(this.conn == null || this.conn.isClosed() || timeNow > this.expiredTime) {
                 this.conn = DriverManager.getConnection(this.connectionString, this.username, this.password);
                 this.stmt = this.conn.createStatement();
+                this.expiredTime = timeNow + 3600000;
             }else if(this.stmt.isClosed()) {
                 this.stmt = this.conn.createStatement();
             }
