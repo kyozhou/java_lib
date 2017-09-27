@@ -91,7 +91,7 @@ public class FastCache {
             if(key == null) {
                 Integer timestampNow = (int) (System.currentTimeMillis() / 1000);
                 Integer cacheSize = this.cache.size();
-                for (int i = 0; i < cacheSize; i++) {
+                for (int i = cacheSize-1; i >= 0; i--) {
                     try {
                         Object value = this.cache.getValue(i);
                         HashMap<String, Object> valueOuter = value instanceof HashMap ?
