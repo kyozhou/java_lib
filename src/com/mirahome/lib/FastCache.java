@@ -90,7 +90,8 @@ public class FastCache {
         try {
             if(key == null) {
                 Integer timestampNow = (int) (System.currentTimeMillis() / 1000);
-                for (int i = 0; i < this.cache.size(); i++) {
+                Integer cacheSize = this.cache.size();
+                for (int i = 0; i < cacheSize; i++) {
                     try {
                         Object value = this.cache.getValue(i);
                         HashMap<String, Object> valueOuter = value instanceof HashMap ?
@@ -100,7 +101,7 @@ public class FastCache {
                             this.cache.remove(i);
                         }
                     }catch (NullPointerException e) {
-                        System.out.println("Warning: cache has been removed...........");
+                        System.out.println("Warning: cache "+ i +" is not matched ...........");
                     }
                 }
             } else {
