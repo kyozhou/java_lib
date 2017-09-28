@@ -91,6 +91,7 @@ public class FastCache {
             if(key == null) {
                 Integer timestampNow = (int) (System.currentTimeMillis() / 1000);
                 Integer cacheSize = this.cache.size();
+                System.out.println("cache size START : " + cacheSize);
                 for (int i = cacheSize-1; i >= 0; i--) {
                     try {
                         Object value = this.cache.getValue(i);
@@ -101,9 +102,11 @@ public class FastCache {
                             this.cache.remove(i);
                         }
                     }catch (NullPointerException e) {
-                        System.out.println("Warning: cache "+ i +" is not matched ...........");
+                        //System.out.println("Warning: cache "+ i +" is not matched ...........");
                     }
                 }
+                Integer cacheSizeNow = this.cache.size();
+                System.out.println("cache size END : " + cacheSizeNow);
             } else {
                 if(key instanceof String) {
                     if (this.cache.containsKey(key)) {

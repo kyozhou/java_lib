@@ -1,5 +1,6 @@
 package com.mirahome.lib;
 
+import com.alibaba.fastjson.JSON;
 import okhttp3.*;
 import org.json.JSONObject;
 
@@ -8,7 +9,6 @@ import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 
 
@@ -22,10 +22,7 @@ public class Utils {
             MessageDigest messageDigest = MessageDigest.getInstance("MD5");
             messageDigest.update(Utils.serialize(input));
             return new BigInteger(1, messageDigest.digest()).toString(16);
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            return null;
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
@@ -43,11 +40,16 @@ public class Utils {
         return is.readObject();
     }
 
+    public static JSON jsonSearch(JSON json, String sql) {
+        JSON finalObj = null;
+
+        return finalObj;
+    }
+
     public static String getLocalIP() {
 
         try {
-            String addr = InetAddress.getLocalHost().getHostAddress();
-            return addr;
+            return InetAddress.getLocalHost().getHostAddress();
         } catch (UnknownHostException e) {
             return "";
         }
