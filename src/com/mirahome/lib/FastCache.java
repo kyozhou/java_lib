@@ -91,7 +91,7 @@ public class FastCache {
             if(key == null) {
                 Integer timestampNow = (int) (System.currentTimeMillis() / 1000);
                 Integer cacheSize = this.cache.size();
-                System.out.println("cache size START : " + cacheSize);
+                //System.out.println("cache size START : " + cacheSize);
                 for (int i = cacheSize-1; i >= 0; i--) {
                     try {
                         Object value = this.cache.getValue(i);
@@ -106,7 +106,7 @@ public class FastCache {
                     }
                 }
                 Integer cacheSizeNow = this.cache.size();
-                System.out.println("cache size END : " + cacheSizeNow);
+                //System.out.println("cache size END : " + cacheSizeNow);
             } else {
                 if(key instanceof String) {
                     if (this.cache.containsKey(key)) {
