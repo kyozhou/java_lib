@@ -37,25 +37,36 @@ public class FastMongoClient {
         return mongos.get(key);
     }
 
-    public FastMongoClient(String connectingString, String database) {
-        this.mongoClient = new MongoClient(new MongoClientURI(connectingString));
-        this.mongoDatabase = mongoClient.getDatabase(database);
+    private FastMongoClient(String connectingString, String database) {
+        try {
+            this.mongoClient = new MongoClient(new MongoClientURI(connectingString));
+            this.mongoDatabase = mongoClient.getDatabase(database);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private synchronized void checkOrReconnect() {
     }
 
     public List<Document> query(String coll, Bson filter, Bson sort, int limit) {
-        MongoCollection<Document> collection = this.mongoDatabase.getCollection(coll);
-
-        FindIterable<Document> findIterable = collection.find(filter);
-        if(sort != null) {
-            findIterable = findIterable.sort(sort);
-        }
-        if(limit > 0) {
-            findIterable = findIterable.limit(limit);
-        }
-        MongoCursor<Document> mongoCursor = findIterable.iterator();
         List<Document> list = new ArrayList<Document>();
-        while (mongoCursor.hasNext()) {
-            list.add(mongoCursor.next());
+        try {
+            MongoCollection<Document> collection = this.mongoDatabase.getCollection(coll);
+
+            FindIterable<Document> findIterable = collection.find(filter);
+            if (sort != null) {
+                findIterable = findIterable.sort(sort);
+            }
+            if (limit > 0) {
+                findIterable = findIterable.limit(limit);
+            }
+            MongoCursor<Document> mongoCursor = findIterable.iterator();
+            while (mongoCursor.hasNext()) {
+                list.add(mongoCursor.next());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return list;
     }
@@ -79,8 +90,12 @@ public class FastMongoClient {
     }
 
     public void insert(String coll, Document data) {
-        MongoCollection<Document> collection = this.mongoDatabase.getCollection(coll);
-        collection.insertOne(data);
+        try {
+            MongoCollection<Document> collection = this.mongoDatabase.getCollection(coll);
+            collection.insertOne(data);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void insertMulti(String coll, List list) {
@@ -96,14 +111,24 @@ public class FastMongoClient {
     }
 
     public boolean update(String coll, Bson filter, Bson newData) {
-        MongoCollection<Document> collection = this.mongoDatabase.getCollection(coll);
-        UpdateResult result = collection.updateOne(filter, newData);
-        return result.getModifiedCount() > 0;
+        try {
+            MongoCollection<Document> collection = this.mongoDatabase.getCollection(coll);
+            UpdateResult result = collection.updateOne(filter, newData);
+            return result.getModifiedCount() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     public boolean delete(String coll, Bson filter) {
-        MongoCollection<Document> collection = this.mongoDatabase.getCollection(coll);
-        DeleteResult result = collection.deleteOne(filter);
-        return result.getDeletedCount() > 0;
+        try {
+            MongoCollection<Document> collection = this.mongoDatabase.getCollection(coll);
+            DeleteResult result = collection.deleteOne(filter);
+            return result.getDeletedCount() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

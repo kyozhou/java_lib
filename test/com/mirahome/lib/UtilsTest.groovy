@@ -23,11 +23,11 @@ class UtilsTest extends groovy.util.GroovyTestCase {
     }
 
     void testCache() {
-        for (int i=0; i< 10; i++) {
-            FastCache.getInstance("test").set(i + "", i);
-        }
-        System.sleep(3000);
-        int iTest = FastCache.getInstance("test").getInt("0")
-        System.out.println(iTest);
+//        for (int i=0; i< 10; i++) {
+//            FastCache.getInstance("test").set(i + "", i);
+//        }
+//        System.sleep(3000);
+//        int iTest = FastCache.getInstance("test").getInt("0")
+//        System.out.println(iTest);
     }
 }
