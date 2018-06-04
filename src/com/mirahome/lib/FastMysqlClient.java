@@ -110,6 +110,9 @@ public class FastMysqlClient {
                         case Types.BIT:
                             row.put(columnName, result.getInt(i));
                             break;
+                        case Types.BLOB:
+                            row.put(columnName, result.getBlob(i));
+                            break;
                         case Types.FLOAT:
                         case Types.DECIMAL:
                             row.put(columnName, result.getFloat(i));
