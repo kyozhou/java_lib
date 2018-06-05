@@ -4,7 +4,7 @@
     <groupId>com.mirahome.lib</groupId>
     <artifactId>JavaLib</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.13</version>
+    <version>1.0.14</version>
     <build>
         <directory>target</directory>
         <outputDirectory>target/classes</outputDirectory>

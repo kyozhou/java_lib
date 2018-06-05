@@ -29,6 +29,11 @@ public class FastMysqlClient {
         return FastMysqlClient.mysqls.get(key);
     }
 
+    public static synchronized FastMysqlClient getInstance(String host, String dbName, String username, String password) {
+        String connectString = "jdbc:mysql://" + host + ":3306/"+dbName+"?autoReconnect=true&autoReconnectForPools=true";
+        return getInstance(connectString, username, password);
+    }
+
     public FastMysqlClient(String connectionString, String username, String password) {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
