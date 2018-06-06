@@ -9,6 +9,7 @@ import java.util.List;
 
 /**
  * Created by zhoubin on 2017/4/27.
+ * deprecated class
  */
 public class FastMysqlClient {
 
