@@ -7,17 +7,17 @@ import java.sql.*;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
- * Created by zhoubin on 2017/4/27.
+ * Created by zhoubin on 2018/6/5.
  */
 public class FastMysqlClient2 {
 
     private static HashMap<String, FastMysqlClient2> clients = new HashMap<String, FastMysqlClient2>();
 
     private BasicDataSource dataSource = null;
-    private PreparedStatement preparedStatement = null;
-    private long expiredTime = 0;
+    private Connection transConnection = null;
 
     public static synchronized FastMysqlClient2 getInstance(String host, String dbName, String username, String password) {
         try {
@@ -43,9 +43,41 @@ public class FastMysqlClient2 {
         this.dataSource.setInitialSize(5);
     }
 
+    public synchronized void offAutoCommit() {
+        try {
+            this.transConnection = this.dataSource.getConnection();
+            this.transConnection.setAutoCommit(false);
+        } catch (SQLException e) {
+            try {
+                this.transConnection.setAutoCommit(true);
+            } catch (SQLException eInner) {
+                eInner.printStackTrace();
+            }
+            e.printStackTrace();
+        }
+    }
+
+    public synchronized void onAutoCommit() {
+        try {
+            this.transConnection.commit();
+            this.transConnection.setAutoCommit(true);
+            this.transConnection.close();
+            this.transConnection = null;
+        } catch (SQLException e) {
+            this.transConnection = null;
+            e.printStackTrace();
+        }
+    }
+
     public Object insert(String sql, List params) {
         try {
-            this.preparedStatement = this.dataSource.getConnection().prepareStatement(sql);
+            Connection connection = null;
+            if(this.transConnection != null && !this.transConnection.getAutoCommit()) {
+                connection = this.transConnection;
+            } else {
+                connection = this.dataSource.getConnection();
+            }
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
             for (int i = 0; i < params.size() ; i++) {
                 preparedStatement.setObject(i+1, params.get(i));
             }
@@ -54,6 +86,10 @@ public class FastMysqlClient2 {
                 ResultSet result = preparedStatement.getGeneratedKeys();
                 Object key = result.getObject(1);
                 if(!result.isClosed()) result.close();
+                if(!preparedStatement.isClosed()) preparedStatement.close();
+                if(this.transConnection == null) {
+                    if (!connection.isClosed()) connection.close();
+                }
                 return key;
             }else {
                 return null;
@@ -66,11 +102,22 @@ public class FastMysqlClient2 {
 
     public boolean update(String sql, List params) {
         try {
-            this.preparedStatement = this.dataSource.getConnection().prepareStatement(sql);
+            Connection connection = null;
+            if(this.transConnection != null && !this.transConnection.getAutoCommit()) {
+                connection = this.transConnection;
+            } else {
+                connection = this.dataSource.getConnection();
+            }
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
             for (int i = 0; i < params.size() ; i++) {
                 preparedStatement.setObject(i+1, params.get(i));
             }
-            return preparedStatement.executeUpdate() > 0;
+            int affectedRows = preparedStatement.executeUpdate();
+            if(!preparedStatement.isClosed()) preparedStatement.close();
+            if(this.transConnection == null) {
+                if (!connection.isClosed()) connection.close();
+            }
+            return affectedRows > 0;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
@@ -83,7 +130,8 @@ public class FastMysqlClient2 {
 
     public List<HashMap> fetchTable(String sql, List params) {
         try {
-            this.preparedStatement = this.dataSource.getConnection().prepareStatement(sql);
+            Connection connection = this.dataSource.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
             for (int i = 0; i < params.size() ; i++) {
                 preparedStatement.setObject(i+1, params.get(i));
             }
@@ -122,21 +170,23 @@ public class FastMysqlClient2 {
                 }
                 table.add(row);
             }
-            //if(!result.isClosed()) result.close();
+            if(!result.isClosed()) result.close();
+            if(!preparedStatement.isClosed()) preparedStatement.close();
+            if(!connection.isClosed()) connection.close();
             return table;
         } catch (SQLException e) {
             e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
-    public HashMap<String, Object> fetchRow(String sql, List params) {
+    public Map<String, Object> fetchRow(String sql, List params) {
         try {
             List<HashMap> table = this.fetchTable(sql, params);
             if (table == null || table.size() == 0) {
                 return null;
             } else {
-                return (HashMap<String, Object>) (table.get(0));
+                return (Map<String, Object>) (table.get(0));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -146,7 +196,8 @@ public class FastMysqlClient2 {
 
     public List<Object> fetchColumn(String sql, List params) {
         try {
-            this.preparedStatement = this.dataSource.getConnection().prepareStatement(sql);
+            Connection connection = this.dataSource.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
             for (int i = 0; i < params.size() ; i++) {
                 preparedStatement.setObject(i+1, params.get(i));
             }
@@ -157,6 +208,8 @@ public class FastMysqlClient2 {
                 column.add(result.getObject(1));
             }
             if(!result.isClosed()) result.close();
+            if(!preparedStatement.isClosed()) preparedStatement.close();
+            if(!connection.isClosed()) connection.close();
             return column;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -167,7 +220,8 @@ public class FastMysqlClient2 {
     public Object fetchCell(String sql, List params) {
         Object returnData = new Object();
         try {
-            this.preparedStatement = this.dataSource.getConnection().prepareStatement(sql);
+            Connection connection = this.dataSource.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
             for (int i = 0; i < params.size() ; i++) {
                 preparedStatement.setObject(i+1, params.get(i));
             }
@@ -176,6 +230,8 @@ public class FastMysqlClient2 {
                 returnData = result.getObject(1);
             }
             if(!result.isClosed()) result.close();
+            if(!preparedStatement.isClosed()) preparedStatement.close();
+            if(!connection.isClosed()) connection.close();
             return returnData;
         } catch (SQLException e) {
             e.printStackTrace();
