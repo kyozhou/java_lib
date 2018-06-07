@@ -57,6 +57,18 @@ public class FastMysqlClient2 {
         }
     }
 
+    public synchronized void rollback() {
+        try {
+            this.transConnection.rollback();
+            this.transConnection.setAutoCommit(true);
+            this.transConnection.close();
+            this.transConnection = null;
+        } catch (SQLException e) {
+            this.transConnection = null;
+            e.printStackTrace();
+        }
+    }
+
     public synchronized void onAutoCommit() {
         try {
             this.transConnection.commit();
