@@ -92,13 +92,17 @@ public class FastMysqlClient2 {
             int affectedRows = preparedStatement.executeUpdate();
             if(affectedRows > 0) {
                 ResultSet result = preparedStatement.getGeneratedKeys();
-                Object key = result.getObject(1);
-                if(!result.isClosed()) result.close();
-                if(!preparedStatement.isClosed()) preparedStatement.close();
-                if(this.transConnection == null) {
-                    if (!connection.isClosed()) connection.close();
+                if(result.next()) {
+                    Object key = result.getObject(1);
+                    if (!result.isClosed()) result.close();
+                    if (!preparedStatement.isClosed()) preparedStatement.close();
+                    if (this.transConnection == null) {
+                        if (!connection.isClosed()) connection.close();
+                    }
+                    return key;
+                } else {
+                    return null;
                 }
-                return key;
             }else {
                 return null;
             }
