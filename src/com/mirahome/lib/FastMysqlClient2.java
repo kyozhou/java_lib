@@ -36,7 +36,7 @@ public class FastMysqlClient2 {
 
     private FastMysqlClient2(String connectionString, String username, String password) {
         this.dataSource = new BasicDataSource();
-        this.dataSource.setDriverClassName("com.mysql.jdbc.Driver");
+        this.dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
         this.dataSource.setUrl(connectionString);
         this.dataSource.setUsername(username);
         this.dataSource.setPassword(password);
@@ -77,7 +77,13 @@ public class FastMysqlClient2 {
         }
     }
 
-    public Object insert(String sql, List params) {
+
+    public boolean insert(String sql, List params) {
+        Object result = this.insert(sql, params, false);
+        return result != null && (result instanceof Integer && (Integer)result > 0);
+    }
+
+    public Integer insert(String sql, List params, boolean returnGeneratedIntKey) {
         try {
             Connection connection = null;
             if(this.transConnection != null && !this.transConnection.getAutoCommit()) {
@@ -91,17 +97,21 @@ public class FastMysqlClient2 {
             }
             int affectedRows = preparedStatement.executeUpdate();
             if(affectedRows > 0) {
-                ResultSet result = preparedStatement.getGeneratedKeys();
-                if(result.next()) {
-                    Object key = result.getObject(1);
-                    if (!result.isClosed()) result.close();
-                    if (!preparedStatement.isClosed()) preparedStatement.close();
-                    if (this.transConnection == null) {
-                        if (!connection.isClosed()) connection.close();
+                if(returnGeneratedIntKey) {
+                    ResultSet result = preparedStatement.getGeneratedKeys();
+                    if (result.next()) {
+                        Integer key = result.getInt(1);
+                        if (!result.isClosed()) result.close();
+                        if (!preparedStatement.isClosed()) preparedStatement.close();
+                        if (this.transConnection == null) {
+                            if (!connection.isClosed()) connection.close();
+                        }
+                        return key;
+                    } else {
+                        return 0;
                     }
-                    return key;
                 } else {
-                    return null;
+                    return affectedRows;
                 }
             }else {
                 return null;

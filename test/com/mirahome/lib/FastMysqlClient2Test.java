@@ -3,6 +3,7 @@ package com.mirahome.lib;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.UUID;
 
 
 public class FastMysqlClient2Test extends groovy.util.GroovyTestCase {
@@ -17,6 +18,10 @@ public class FastMysqlClient2Test extends groovy.util.GroovyTestCase {
                 "test",
                 "root",
                 "Mianmian520");
-        dbDefault.insert("INSERT INTO ms_db(name)VALUES(?)", Arrays.asList("test"));
+        boolean result = dbDefault.insert(
+                "INSERT INTO ms_db(id, name)VALUES(?, ?)",
+                Arrays.asList(UUID.randomUUID().toString(), "test")
+        );
+        System.out.println("test insert end" + (result));
     }
 }
