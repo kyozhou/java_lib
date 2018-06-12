@@ -89,8 +89,8 @@ public class FastMysqlClient2 {
             for (int i = 0; i < params.size() ; i++) {
                 preparedStatement.setObject(i+1, params.get(i));
             }
-            boolean isSuccess = preparedStatement.execute();
-            if(isSuccess) {
+            int affectedRows = preparedStatement.executeUpdate();
+            if(affectedRows > 0) {
                 ResultSet result = preparedStatement.getGeneratedKeys();
                 Object key = result.getObject(1);
                 if(!result.isClosed()) result.close();
