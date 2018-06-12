@@ -18,9 +18,10 @@ public class FastMysqlClient2Test extends groovy.util.GroovyTestCase {
                 "test",
                 "root",
                 "Mianmian520");
-        boolean result = dbDefault.insert(
+        Integer result = dbDefault.insert(
                 "INSERT INTO ms_db(id, name)VALUES(?, ?)",
-                Arrays.asList(UUID.randomUUID().toString(), "test")
+                Arrays.asList(UUID.randomUUID().toString(), "test"),
+                true
         );
         System.out.println("test insert end" + (result));
     }

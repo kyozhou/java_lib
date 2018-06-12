@@ -78,12 +78,17 @@ public class FastMysqlClient2 {
     }
 
 
-    public boolean insert(String sql, List params) {
-        Integer result = this.insert(sql, params, false);
+    public boolean execute(String sql, Object... params) {
+        Integer result = this.insertOrigin(sql, false, params);
         return result != null && result > 0;
     }
 
-    public Integer insert(String sql, List params, boolean returnGeneratedIntKey) {
+    public Integer insert(String sql, Object... params) {
+        Integer affectedRows = this.insertOrigin(sql, true, params);
+        return affectedRows;
+    }
+
+    private Integer insertOrigin(String sql, boolean returnGeneratedIntKey, Object... params) {
         try {
             Connection connection = null;
             if(this.transConnection != null && !this.transConnection.getAutoCommit()) {
@@ -92,14 +97,15 @@ public class FastMysqlClient2 {
                 connection = this.dataSource.getConnection();
             }
             PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            for (int i = 0; i < params.size() ; i++) {
-                preparedStatement.setObject(i+1, params.get(i));
+            for (int i = 0; i < params.length ; i++) {
+                preparedStatement.setObject(i+1, params[i]);
             }
             int affectedRows = preparedStatement.executeUpdate();
             if(affectedRows > 0) {
                 if(returnGeneratedIntKey) {
                     ResultSet result = preparedStatement.getGeneratedKeys();
                     if (result.next()) {
+                        String stringKey = result.getString(1);
                         Integer key = result.getInt(1);
                         if (!result.isClosed()) result.close();
                         if (!preparedStatement.isClosed()) preparedStatement.close();
@@ -122,7 +128,12 @@ public class FastMysqlClient2 {
         }
     }
 
-    public boolean update(String sql, List params) {
+
+    public boolean update(String sql, Object... params) {
+        return this.updateOrigin(sql, params);
+    }
+
+    private boolean updateOrigin(String sql, Object[] params) {
         try {
             Connection connection = null;
             if(this.transConnection != null && !this.transConnection.getAutoCommit()) {
@@ -131,8 +142,8 @@ public class FastMysqlClient2 {
                 connection = this.dataSource.getConnection();
             }
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            for (int i = 0; i < params.size() ; i++) {
-                preparedStatement.setObject(i+1, params.get(i));
+            for (int i = 0; i < params.length ; i++) {
+                preparedStatement.setObject(i+1, params[i]);
             }
             int affectedRows = preparedStatement.executeUpdate();
             if(!preparedStatement.isClosed()) preparedStatement.close();
@@ -146,16 +157,20 @@ public class FastMysqlClient2 {
         }
     }
 
-    public boolean delete(String sql, List params) {
-        return this.update(sql, params);
+    public boolean delete(String sql, Object... params) {
+        return this.updateOrigin(sql, params);
     }
 
-    public List<HashMap> fetchTable(String sql, List params) {
+    public List<HashMap> fetchTable(String sql, Object... params) {
+        return this.fetchTableOrigin(sql, params);
+    }
+
+    private List<HashMap> fetchTableOrigin(String sql, Object[] params) {
         try {
             Connection connection = this.dataSource.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            for (int i = 0; i < params.size() ; i++) {
-                preparedStatement.setObject(i+1, params.get(i));
+            for (int i = 0; i < params.length ; i++) {
+                preparedStatement.setObject(i+1, params[i]);
             }
             ResultSet result = preparedStatement.executeQuery();
             List<HashMap> table = new LinkedList<HashMap>();
@@ -202,9 +217,9 @@ public class FastMysqlClient2 {
         }
     }
 
-    public Map<String, Object> fetchRow(String sql, List params) {
+    public Map<String, Object> fetchRow(String sql, Object... params) {
         try {
-            List<HashMap> table = this.fetchTable(sql, params);
+            List<HashMap> table = this.fetchTableOrigin(sql, params);
             if (table == null || table.size() == 0) {
                 return null;
             } else {
@@ -216,12 +231,12 @@ public class FastMysqlClient2 {
         }
     }
 
-    public List<Object> fetchColumn(String sql, List params) {
+    public List<Object> fetchColumn(String sql, Object... params) {
         try {
             Connection connection = this.dataSource.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            for (int i = 0; i < params.size() ; i++) {
-                preparedStatement.setObject(i+1, params.get(i));
+            for (int i = 0; i < params.length ; i++) {
+                preparedStatement.setObject(i+1, params[i]);
             }
             ResultSet result = preparedStatement.executeQuery();
             ResultSetMetaData metaData = result.getMetaData();
@@ -239,13 +254,13 @@ public class FastMysqlClient2 {
         return null;
     }
 
-    public Object fetchCell(String sql, List params) {
+    public Object fetchCell(String sql, Object... params) {
         Object returnData = new Object();
         try {
             Connection connection = this.dataSource.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            for (int i = 0; i < params.size() ; i++) {
-                preparedStatement.setObject(i+1, params.get(i));
+            for (int i = 0; i < params.length ; i++) {
+                preparedStatement.setObject(i+1, params[i]);
             }
             ResultSet result = preparedStatement.executeQuery();
             if (result.next()) {
