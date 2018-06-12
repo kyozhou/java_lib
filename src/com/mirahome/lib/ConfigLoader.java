@@ -36,7 +36,7 @@ public class ConfigLoader {
             try {
                 this.zkClient.close();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                System.out.println("this.zkClient.close failed");
             }
         }
         boolean needRetry = true;
@@ -51,7 +51,7 @@ public class ConfigLoader {
                         connectedLatch.await();
                         needRetry = false;
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        System.out.println("connectedLatch.await failed");
                     }
                 }
             } catch (IOException e) {
@@ -63,7 +63,8 @@ public class ConfigLoader {
                 try {
                     Thread.sleep(3000);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    //e.printStackTrace();
+                    System.out.println("Thread.sleep failed");
                 }
             }
         }

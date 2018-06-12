@@ -48,23 +48,19 @@ public class FastMysqlClient2 {
             this.transConnection = this.dataSource.getConnection();
             this.transConnection.setAutoCommit(false);
         } catch (SQLException e) {
+            e.printStackTrace();
             try {
                 this.transConnection.setAutoCommit(true);
             } catch (SQLException eInner) {
                 eInner.printStackTrace();
             }
-            e.printStackTrace();
         }
     }
 
     public synchronized void rollback() {
         try {
             this.transConnection.rollback();
-            this.transConnection.setAutoCommit(true);
-            this.transConnection.close();
-            this.transConnection = null;
         } catch (SQLException e) {
-            this.transConnection = null;
             e.printStackTrace();
         }
     }
