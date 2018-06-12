@@ -36,7 +36,7 @@ public class FastMysqlClient2 {
 
     private FastMysqlClient2(String connectionString, String username, String password) {
         this.dataSource = new BasicDataSource();
-        this.dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
+        this.dataSource.setDriverClassName("com.mysql.jdbc.Driver");
         this.dataSource.setUrl(connectionString);
         this.dataSource.setUsername(username);
         this.dataSource.setPassword(password);
@@ -79,8 +79,8 @@ public class FastMysqlClient2 {
 
 
     public boolean insert(String sql, List params) {
-        Object result = this.insert(sql, params, false);
-        return result != null && (result instanceof Integer && (Integer)result > 0);
+        Integer result = this.insert(sql, params, false);
+        return result != null && result > 0;
     }
 
     public Integer insert(String sql, List params, boolean returnGeneratedIntKey) {

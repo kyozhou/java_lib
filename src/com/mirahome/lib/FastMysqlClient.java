@@ -37,7 +37,7 @@ public class FastMysqlClient {
 
     public FastMysqlClient(String connectionString, String username, String password) {
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
+            Class.forName("com.mysql.jdbc.Driver");
             //this.conn = DriverManager.getConnection(connectionString + "user=mira&password=Mianmian2o16&useUnicode=true&characterEncoding=UTF-8");
             this.connectionString = connectionString;
             this.username = username;
