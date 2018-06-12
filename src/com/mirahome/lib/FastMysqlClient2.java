@@ -255,7 +255,7 @@ public class FastMysqlClient2 {
     }
 
     public Object fetchCell(String sql, Object... params) {
-        Object returnData = new Object();
+        Object returnData = null;
         try {
             Connection connection = this.dataSource.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
