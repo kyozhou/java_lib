@@ -78,14 +78,14 @@ public class FastMysqlClient2 {
     }
 
 
-    public boolean execute(String sql, Object... params) {
+    public boolean insertWithBool(String sql, Object... params) {
         Integer result = this.insertOrigin(sql, false, params);
         return result != null && result > 0;
     }
 
     public Integer insert(String sql, Object... params) {
-        Integer affectedRows = this.insertOrigin(sql, true, params);
-        return affectedRows;
+        Integer generatedIntKey = this.insertOrigin(sql, true, params);
+        return generatedIntKey;
     }
 
     private Integer insertOrigin(String sql, boolean returnGeneratedIntKey, Object... params) {
