@@ -78,7 +78,7 @@ public class FastMysqlClient2 {
     }
 
 
-    public boolean insertWithBool(String sql, Object... params) {
+    public boolean insertForBool(String sql, Object... params) {
         Integer result = this.insertOrigin(sql, false, params);
         return result != null && result > 0;
     }

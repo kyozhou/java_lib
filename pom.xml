@@ -4,7 +4,9 @@
     <groupId>com.mirahome.lib</groupId>
     <artifactId>JavaLib</artifactId>
     <packaging>jar</packaging>
-    <version>1.2.3</version>
+    <version>1.2.4</version>
+    <name>JavaLib</name>
+    <url>https://mirahome.com</url>
     <build>
         <directory>target</directory>
         <outputDirectory>target/classes</outputDirectory>
@@ -47,8 +49,6 @@
             </plugin>
         </plugins>
     </build>
-    <name>JavaLib</name>
-    <url>https://mirahome.com</url>
     <dependencies>
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
