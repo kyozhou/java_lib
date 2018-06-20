@@ -150,7 +150,7 @@ public class FastMysqlClient2 {
             if(this.transConnection == null) {
                 if (!connection.isClosed()) connection.close();
             }
-            return affectedRows > 0;
+            return true;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
