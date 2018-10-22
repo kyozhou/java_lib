@@ -3,7 +3,7 @@
   <groupId>com.mirahome.lib</groupId>
   <artifactId>JavaLib</artifactId>
   <versioning>
-    <release>1.2.5</release>
+    <release>1.2.6</release>
     <versions>
       <version>1.0</version>
       <version>1.0.1</version>
@@ -35,7 +35,8 @@
       <version>1.2.3</version>
       <version>1.2.4</version>
       <version>1.2.5</version>
+      <version>1.2.6</version>
     </versions>
-    <lastUpdated>20180620074809</lastUpdated>
+    <lastUpdated>20180702071652</lastUpdated>
   </versioning>
 </metadata>
