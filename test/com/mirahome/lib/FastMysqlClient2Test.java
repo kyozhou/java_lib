@@ -1,6 +1,6 @@
 package com.mirahome.lib;
 
-public class FastMysqlClient2Test extends groovy.util.GroovyTestCase {
+//public class FastMysqlClient2Test extends groovy.util.GroovyTestCase {
 //    public FastMysqlClient2Test() {
 //        this.testInsert();
 //    }
@@ -18,4 +18,4 @@ public class FastMysqlClient2Test extends groovy.util.GroovyTestCase {
 //        );
 //        System.out.println("test insert end" + (result));
 //    }
-}
+//}
